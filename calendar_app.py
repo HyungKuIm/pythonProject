@@ -12,7 +12,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 
 class Ui_Form(QWidget):
-
+    # 데이터 구조(딕셔너리)
+    # ex> {'2023-06-14' : [{'time' : '12:00', 'title' : '영화', 'detail' : '글러브'},{...}],
+    #        ....}
     events = {}
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -34,6 +36,8 @@ class Ui_Form(QWidget):
 
         self.event_list.itemSelectionChanged.connect(self.populate_form)
 
+
+
         self.event_list.setObjectName("event_list")
         self.verticalLayout.addWidget(self.event_list)
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -49,6 +53,12 @@ class Ui_Form(QWidget):
         # Delete Button
         self.pushButton_2 = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_2.setObjectName("pushButton_2")
+
+        self.event_list.itemSelectionChanged.connect(self.check_delete_btn)
+        self.check_delete_btn()
+
+        self.pushButton_2.clicked.connect(self.delete_event)
+
         # self.pushButton_2.clicked.connect(self.save_event)
         self.gridLayout.addWidget(self.pushButton_2, 3, 3, 1, 1)
 
@@ -154,6 +164,17 @@ class Ui_Form(QWidget):
         self.events[date] = event_list
 
         self.populate_list()
+
+    def delete_event(self):
+        date = self.calendar.selectedDate()
+        row = self.event_list.currentRow()
+        del(self.events[date][row])
+        self.event_list.setCurrentRow(-1)
+        self.clear_form()
+        self.populate_list()
+
+    def check_delete_btn(self):
+        self.pushButton_2.setDisabled(self.event_list.currentRow() == -1)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
