@@ -14,12 +14,15 @@ class ui(QDialog):
         loadUi('capture_screen.ui', self)
         self.logic = 0
         self.value = 1
+        self.close = False
         self.SHOW.clicked.connect(self.onClicked)
         self.CAPTURE.clicked.connect(self.CaptureClicked)
+        self.CLOSE.clicked.connect(self.CloseVideo)
+        self.closeEvent = self.CloseVideo
 
     @pyqtSlot()
     def onClicked(self):
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)  # 노트북일 경우 내장 카메라 0, 그다음 1
 
         while (cap.isOpened()):
 
@@ -28,6 +31,9 @@ class ui(QDialog):
                 print('here')
                 self.displayImage(frame, 1)
                 cv2.waitKey()
+
+                if self.close == True:
+                    break
 
                 if (self.logic==2):
                     self.value = self.value + 1
@@ -41,6 +47,9 @@ class ui(QDialog):
     @pyqtSlot()
     def CaptureClicked(self):
         self.logic = 2
+
+    def CloseVideo(self):
+        self.close = True
 
     def displayImage(self, img, window=1):
         qformat = QImage.Format_Indexed8

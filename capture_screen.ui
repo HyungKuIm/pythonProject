@@ -77,6 +77,19 @@
     <string/>
    </property>
   </widget>
+  <widget class="QPushButton" name="CLOSE">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>390</y>
+     <width>211</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
