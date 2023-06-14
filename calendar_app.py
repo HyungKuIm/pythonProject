@@ -11,6 +11,44 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 
+class CategoryWindow(QtWidgets.QWidget):
+    """A basic dialog to demonstrate inter-widget communication"""
+
+    # when submitted, we'll emit this signal
+    # with the entered string
+    submitted = QtCore.pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__(None, modal=True)
+
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().addWidget(
+            QtWidgets.QLabel('Please enter a new catgory name:')
+            )
+        self.category_entry = QtWidgets.QLineEdit()
+        self.layout().addWidget(self.category_entry)
+
+        self.submit_btn = QtWidgets.QPushButton(
+            'Submit',
+            clicked=self.onSubmit
+            )
+        self.layout().addWidget(self.submit_btn)
+        self.cancel_btn = QtWidgets.QPushButton(
+            'Cancel',
+            # Errata:  The book contains this line:
+            #clicked=self.destroy
+            # It should call self.close instead, like so:
+            clicked=self.close
+            )
+        self.layout().addWidget(self.cancel_btn)
+        self.show()
+
+    @QtCore.pyqtSlot()
+    def onSubmit(self):
+        if self.category_entry.text():
+            self.submitted.emit(self.category_entry.text())
+        self.close()
+
 class Ui_Form(QWidget):
     # 데이터 구조(딕셔너리)
     # ex> {'2023-06-14' : [{'time' : '12:00', 'title' : '영화', 'detail' : '글러브'},{...}],
@@ -84,11 +122,12 @@ class Ui_Form(QWidget):
 
         # Add event categories
         self.event_category.addItems(
-            ['Select category…', 'New…', 'Work',
+            ['Select category…', 'New...', 'Work',
              'Meeting', 'Doctor', 'Family']
         )
         # disable the first category item
         self.event_category.model().item(0).setEnabled(False)
+        self.event_category.currentTextChanged.connect(self.on_category_change)
 
         self.event_category.setObjectName("event_category")
         self.gridLayout.addWidget(self.event_category, 1, 0, 1, 2)
@@ -109,7 +148,7 @@ class Ui_Form(QWidget):
         # As reported by github user eramey16, we need the following line
         # to unselect list items since the selected index may not exist
         # in the new list.  This line is not in the book code.
-        # self.event_list.setCurrentRow(-1)
+        self.event_list.setCurrentRow(-1)
 
         self.event_list.clear()
         self.clear_form()
@@ -175,6 +214,16 @@ class Ui_Form(QWidget):
 
     def check_delete_btn(self):
         self.pushButton_2.setDisabled(self.event_list.currentRow() == -1)
+
+    def on_category_change(self, text):
+        if text == 'New...':
+            self.dialog = CategoryWindow()
+            self.dialog.submitted.connect(self.add_category)
+            self.event_category.setCurrentIndex(0)
+
+    def add_category(self, category):
+        self.event_category.addItem(category)
+        self.event_category.setCurrentText(category)
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
