@@ -27,8 +27,18 @@ class ui(QDialog):
         date = datetime.datetime.now()
         # filename, fourcc, fps, frameSize
         out = cv2.VideoWriter('videos/Video_%s%s%sT%s%s%s.mp4' %(date.year,date.month,date.day,date.hour,date.minute,date.second), -1, 20.0, (640, 480))
+        Duration = self.Duration.toPlainText()
+        duration = int(Duration)
+        count = 0
         print('here')
         while (cap.isOpened()):
+
+            date1 = datetime.datetime.now()
+            if (((date1.second-date.second) >= 1) | ((date.second-date1.second) >= 1)):
+                count = count + 1
+                date = datetime.datetime.now()
+
+                print(count)
 
             ret, frame = cap.read()
             if ret == True:
@@ -41,6 +51,11 @@ class ui(QDialog):
 
                     self.TEXT.setText('Vedeo 레코딩 시작')
                 if (self.logic == 0):
+                    self.TEXT.setText('Vedeo 레코딩 종료')
+
+                    break
+
+                if (count > duration):
                     self.TEXT.setText('Vedeo 레코딩 종료')
 
                     break
