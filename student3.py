@@ -18,7 +18,7 @@ class ui(QDialog):
         self.SHOW.clicked.connect(self.onClicked)
         self.CAPTURE.clicked.connect(self.CaptureClicked)
         self.CLOSE.clicked.connect(self.CloseVideo)
-        self.closeEvent = self.CloseVideo
+        # self.closeEvent = self.CloseVideo
 
     @pyqtSlot()
     def onClicked(self):
@@ -50,6 +50,12 @@ class ui(QDialog):
 
     def CloseVideo(self):
         self.close = True
+
+    def closeEvent(self, event):
+        print("Close clicked")
+        event.ignore()
+        self.CloseVideo()
+        event.accept()
 
     def displayImage(self, img, window=1):
         qformat = QImage.Format_Indexed8
